@@ -1,0 +1,55 @@
+<section
+  class="about-me-section py-[70px] md:py-[80px] lg:py-[100px] flex flex-col lg:flex-row justify-between border-b border-darkBorder"
+>
+  <div>
+    <h2
+      class="text-[30px] md:text-[50px] lg:text-[4rem] leading-[70px] lg:leading-[80px] font-bold mb-[30px] text-textLightPrimary"
+    >
+      About Me
+    </h2>
+    <div
+      class="max-w-none lg:max-w-[310px] text-textDullest text-[1rem] leading-[1.5em] mb-[40px]"
+    >
+      I&apos;m a React Native and Frontend Web Developer based in Bahawalpur,
+      Pakistan. I build responsive and dynamic web and mobile interfaces with
+      React.js, React Native, Next.js, Tailwind CSS, JavaScript (ES6+), and
+      TypeScript. I enjoy creative problem-solving and performance-focused UI
+      development, and I am excited to collaborate on impactful products.
+    </div>
+  </div>
+  <div
+    class="ml-0 lg:ml-[80px] max-w-none md:max-w-[80%] lg:max-w-[61%] w-full"
+  >
+    <h3
+      class="text-[22px] md:text-[24px] leading-[30px] md:leading-[34px] mb-[30px] text-textLightPrimary"
+    >
+      I&apos;ve developed and worked for:
+    </h3>
+    <div
+      class="text-[30px] md:text-[50px] lg:text-[4rem] leading-[40px] md:leading-[60px] lg:leading-[80px] text-textLightPrimary"
+    >
+      Algotix.ai <br />
+      React.js Apps <br />
+      React Native Apps <br />
+      Next.js Interfaces <br />
+      Animated UI/UX <br />
+      Scalable Frontend Components <br />
+    </div>
+  </div>
+</section>
+
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  gsap.to('.fixed_footer', {
+    scrollTrigger: {
+      trigger: '.about-me-section',
+      start: 'top top%',
+      end: 'bottom 80%',
+      scrub: true,
+    },
+    zIndex: 2,
+  });
+</script>
