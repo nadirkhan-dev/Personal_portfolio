@@ -1,0 +1,166 @@
+---
+import Icon from 'astro-icon';
+
+type Project = {
+  _id: string;
+  name: string;
+  category: string;
+  description: string;
+  url: string;
+  videoUrl: string;
+};
+
+interface ProjectsProps {
+  project: Project;
+  index: number;
+  totalLength: number;
+}
+
+const { project, index, totalLength } = Astro.props;
+---
+
+<section
+  class:list={[
+    'project-section bg-white px-pageXMobile md:px-pageX relative',
+    { 'pt-[40px] md:pt-[0px]': index === 0 },
+    { 'pb-[40px] md:pb-[0px]': index == totalLength - 1 },
+  ]}
+>
+  <div
+    class:list={[
+      `flex flex-col lg:flex-row items-center h-full py-[40px] md:py-[80px]`,
+      { 'md:border-b md:border-[#efefef]': index !== totalLength - 1 },
+    ]}
+  >
+    <div>
+      <!-- project section -->
+      <div
+        class="flex flex-col lg:flex-row items-center gap-0 md:gap-10 lg:gap-40"
+      >
+        <!-- project description -->
+        <div class="max-w-full w-full lg:max-w-[30%] flex flex-col">
+          <div
+            class="reveal-type text-background hidden lg:block text-[1rem] font-[700] mb-7 leading-[1.5rem] uppercase"
+          >
+            Project
+          </div>
+          <div
+            class="reveal-type text-background text-[35px] md:text-[50px] lg:text-[4rem]
+             font-bold uppercase leading-[40px] md:leading-[65px] mb-[30px] md:mb-[20px] lg:mb-8"
+          >
+            {project.name}
+          </div>
+          <div
+            class="hidden reveal-type text-background text-[16px] capitalize mb-[30px] md:mb-[20px] lg:mb-8"
+          >
+            {project.category}
+          </div>
+          <div
+            class="reveal-type text-[1rem] md:text-[20px] block lg:text-[22px] md:leading[30px] lg:leading-[27px] mb-8 text-background"
+          >
+            {project.description}
+          </div>
+          <a
+            href={project.url}
+            class="interactable interactable-link"
+            target="_blank"
+            role="button"
+            aria-label="See in action"
+          >
+            <div
+              class="border-black border-2 text-black px-6 py-4 w-max rounded-full text-[16px] group font-bold uppercase leading-[1.5rem] hidden lg:flex items-center gap-2 transition-all"
+            >
+              See in action <span
+                ><Icon
+                  name="gg:arrow-right"
+                  class="w-[30px] group-hover:-rotate-45 transition-all"
+                /></span
+              >
+            </div>
+          </a>
+        </div>
+        <!-- project video -->
+        <div class="w-full flex-1">
+          <a
+            href={project.url}
+            aria-label={project.name}
+            class="interactable interactable-link"
+            target="_blank"
+          >
+            <video
+              poster={project.posterImage}
+              class="project-video lazy w-full h-[auto]"
+              loop
+              data-src={project.videoUrl}
+              muted
+              playsinline
+              preload="auto"
+            >
+              <source data-src={project.videoUrl} type="video/mp4" />
+               Your browser does not support the video tag.
+            </video>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import gsap from 'gsap';
+  import LazyLoad from 'vanilla-lazyload';
+  import { ScrollTrigger } from 'gsap/all';
+  import SplitType from 'split-type';
+  gsap.registerPlugin(ScrollTrigger);
+
+  // selecting all the text with reaveal-type class
+  const splitTypes = document.querySelectorAll('.reveal-type');
+
+  splitTypes.forEach((char) => {
+    const text = new SplitType(char, { types: 'lines' });
+
+    gsap.from(text.lines, {
+      scrollTrigger: {
+        trigger: char,
+        start: 'top 80%',
+        end: 'top 40%',
+        scrub: false,
+      },
+      ease: 'power4.out',
+      scaleY: 0,
+      y: 50,
+      transformOrigin: 'top',
+      stagger: 0.2,
+      duration: 0.5,
+    });
+  });
+
+  const lazy = new LazyLoad({
+    threshold: 1500,
+  });
+  lazy.update();
+
+  // only play the video when it is in the viewport
+  document.addEventListener('DOMContentLoaded', () => {
+    const videos = document.querySelectorAll('.project-video');
+
+    const handleIntersection = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
+      entries.forEach((entry: IntersectionObserverEntry) => {
+        const video = entry.target as HTMLVideoElement;
+        if (entry.isIntersecting) {
+          video.play();
+        } else {
+          video.pause();
+        }
+      });
+    };
+
+    const videoObserver = new IntersectionObserver(handleIntersection, {
+      threshold: 0.2, // Adjust the threshold as needed (between 0 and 1)
+    });
+
+    videos.forEach((video) => {
+      videoObserver.observe(video);
+    });
+  });
+</script>

@@ -1,0 +1,86 @@
+---
+import ProjectsView from './ProjectsView.astro';
+import { createClient } from '@sanity/client';
+
+type Project = {
+  _id: string;
+  name: string;
+  category: string;
+  description: string;
+  url: string;
+  posterImage: string;
+  videoUrl: string;
+};
+
+const fallbackProjects: Project[] = [
+  {
+    _id: 'fallback-1',
+    name: 'Featured Project',
+    category: 'Web App',
+    description: 'Design preview mode without CMS credentials.',
+    url: '#',
+    posterImage: '/hero-image.webp',
+    videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+  },
+  {
+    _id: 'fallback-2',
+    name: 'Product Experience',
+    category: 'Frontend',
+    description: 'Animations, layout and interactions are still visible.',
+    url: '#',
+    posterImage: '/hero-image.webp',
+    videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+  },
+  {
+    _id: 'fallback-3',
+    name: 'Performance Build',
+    category: 'Optimization',
+    description: 'Replace this with real content once credentials are added.',
+    url: '#',
+    posterImage: '/hero-image.webp',
+    videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+  },
+];
+
+async function getAllProject(): Promise<Project[]> {
+  const projectId = import.meta.env.PUBLIC_SANITY_PROJECT_ID;
+  const dataset = import.meta.env.PUBLIC_SANITY_DATASET;
+  const hasSanityEnv = Boolean(projectId) && Boolean(dataset);
+  if (!hasSanityEnv) {
+    return fallbackProjects;
+  }
+
+  const query = `*[_type == "projects"] | order(sortOrder asc) {
+  _id,
+  name,
+  category,
+  description,
+  url,
+  "posterImage":posterImage.asset->url,
+  "videoUrl": video.asset->url,
+}`;
+  try {
+    const sanityClient = createClient({
+      projectId,
+      dataset,
+      useCdn: true,
+      apiVersion: '2024-01-01',
+    });
+    const projects = await sanityClient.fetch(query);
+    return Array.isArray(projects) && projects.length > 0 ? projects : fallbackProjects;
+  } catch (error) {
+    console.warn('Sanity fetch failed, using fallback projects for preview mode.', error);
+    return fallbackProjects;
+  }
+}
+
+const projects: Project[] = await getAllProject();
+---
+
+<section id="portfolio-projects" class="w-full dark-trailer">
+  {
+    projects.map((project: Project, index: number) => (
+      <ProjectsView project={project} index={index} totalLength={projects.length} />
+    ))
+  }
+</section>
