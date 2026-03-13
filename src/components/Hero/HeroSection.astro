@@ -6,7 +6,7 @@ import MainTitle from './MainTitle.astro';
 <div class="parallax-section h-screen w-full bg-darkBackground">
   <div class="fixed top-0 h-screen w-full">
     <section
-      class="hero-section min-w-full bg-hero-image bg-no-repeat bg-black w-full z-[1]"
+      class="hero-section min-w-full bg-black w-full z-[1]"
     >
       <div class="bg-overlay-2">
         <div
@@ -22,21 +22,62 @@ import MainTitle from './MainTitle.astro';
 
 <style>
   .hero-section {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-image: url('/nadir-hero.png');
+    background-repeat: no-repeat;
     background-size: auto 90%;
     background-position: center 8%;
+    filter: contrast(1.08) saturate(1.12) brightness(0.95);
+    transform: scale(1.02);
+    animation: heroFloat 14s ease-in-out infinite alternate;
+  }
+
+  .hero-section::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        circle at 50% 32%,
+        rgba(213, 255, 63, 0.12) 0%,
+        rgba(213, 255, 63, 0) 42%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.28) 0%,
+        rgba(0, 0, 0, 0.12) 30%,
+        rgba(0, 0, 0, 0.45) 100%
+      );
   }
 
   @media (min-width: 768px) {
-    .hero-section {
+    .hero-section::before {
       background-size: auto 94%;
       background-position: center 10%;
     }
   }
 
   @media (min-width: 1200px) {
-    .hero-section {
+    .hero-section::before {
       background-size: auto 96%;
       background-position: center 12%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-section::before {
+      animation: none;
     }
   }
 
@@ -55,6 +96,15 @@ import MainTitle from './MainTitle.astro';
       rgba(13, 13, 13, 0.88) 13.06%,
       rgba(13, 13, 13, 0) 100%
     );
+  }
+
+  @keyframes heroFloat {
+    from {
+      transform: scale(1.02) translateY(0px);
+    }
+    to {
+      transform: scale(1.04) translateY(-12px);
+    }
   }
 </style>
 
