@@ -14,6 +14,8 @@ const {
 const hasSanityEnv = Boolean(PUBLIC_SANITY_PROJECT_ID) && Boolean(PUBLIC_SANITY_DATASET);
 
 export default defineConfig({
+  site: "https://nadirkhan-dev.github.io",
+  base: "/Personal_portfolio/",
   integrations: [tailwind(),
     partytown({
       config: {
