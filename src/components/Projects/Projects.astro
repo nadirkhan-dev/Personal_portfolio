@@ -7,38 +7,45 @@ type Project = {
   name: string;
   category: string;
   description: string;
-  url: string;
+  url?: string;
+  links?: { label: string; url: string }[];
   posterImage: string;
-  videoUrl: string;
+  videoUrl?: string;
 };
 
 const fallbackProjects: Project[] = [
   {
-    _id: 'fallback-1',
-    name: 'Featured Project',
+    _id: 'smart-attendance-hr',
+    name: 'Smart Attendance — HR Portal',
     category: 'Web App',
-    description: 'Design preview mode without CMS credentials.',
-    url: '#',
+    description:
+      'HR portal for employee management, shift scheduling, attendance tracking, and approval workflows.',
+    url: 'https://smart-attendance-portal-web.onrender.com',
+    links: [{ label: 'HR Portal', url: 'https://smart-attendance-portal-web.onrender.com' }],
     posterImage: '/hero-image.webp',
-    videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+    videoUrl: '/projects/hr.mp4',
   },
   {
-    _id: 'fallback-2',
-    name: 'Product Experience',
-    category: 'Frontend',
-    description: 'Animations, layout and interactions are still visible.',
-    url: '#',
+    _id: 'smart-attendance-admin',
+    name: 'Smart Attendance — Admin Portal',
+    category: 'Admin Console',
+    description:
+      'Super Admin portal for onboarding organizations, managing HR users, and system-wide configuration.',
+    url: 'https://smart-attendance-portal-admin.onrender.com',
+    links: [{ label: 'Admin Portal', url: 'https://smart-attendance-portal-admin.onrender.com' }],
     posterImage: '/hero-image.webp',
-    videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+    videoUrl: '/projects/admin.mp4',
   },
   {
-    _id: 'fallback-3',
-    name: 'Performance Build',
-    category: 'Optimization',
-    description: 'Replace this with real content once credentials are added.',
-    url: '#',
+    _id: 'smart-attendance-emp',
+    name: 'Smart Attendance — Employee Portal',
+    category: 'Employee Experience',
+    description:
+      'Employee-facing portal to view shifts, track attendance history, and submit WFH or shift requests.',
+    url: 'https://smart-attendance-portal-web.onrender.com',
+    links: [{ label: 'Employee Portal', url: 'https://smart-attendance-portal-web.onrender.com' }],
     posterImage: '/hero-image.webp',
-    videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+    videoUrl: '/projects/emp.mp4',
   },
 ];
 
@@ -77,7 +84,7 @@ async function getAllProject(): Promise<Project[]> {
 const projects: Project[] = await getAllProject();
 ---
 
-<section id="portfolio-projects" class="w-full dark-trailer">
+<section id="portfolio-projects" class="w-full dark-trailer relative z-30">
   {
     projects.map((project: Project, index: number) => (
       <ProjectsView project={project} index={index} totalLength={projects.length} />

@@ -3,9 +3,12 @@ import Flower from './Flower.astro';
 ---
 
 <div
-  class="brands-wrapper bg-black px-pageXMobile md:px-pageX text-white overflow-x-hidden relative z-10 min-h-screen flex items-center"
+  class="brands-wrapper bg-black px-pageXMobile md:px-pageX text-white overflow-x-hidden relative z-40 min-h-screen flex items-center"
 >
-  <div class="container gap-4 md:gap-8 py-[12vh] md:py-[14vh] scrollx items-stretch" id="why-work-with-me">
+  <div
+    class="container gap-4 md:gap-8 py-[12vh] md:py-[14vh] items-stretch"
+    id="why-work-with-me"
+  >
       <div
         class="bg-primary brands-section pin p-8 md:p-10 min-w-[33%] md:min-w-[50%] lg:min-w-[44%] xl:min-w-[36%] 2xl:min-w-[30%] rounded-3xl relative overflow-hidden"
       >
@@ -140,68 +143,35 @@ import Flower from './Flower.astro';
 
 <style>
   .container {
-    display: flex;
-    width: max-content;
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr;
   }
   .brands-section {
-    min-width: 82vw !important;
-    flex: 0 0 82vw;
-    min-height: 62vh;
+    min-width: 0 !important;
+    min-height: auto;
   }
   @media (min-width: 768px) {
-    .brands-section {
-      min-width: 58vw !important;
-      flex-basis: 58vw;
-      min-height: 64vh;
+    .container {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
   @media (min-width: 1024px) {
-    .brands-section {
-      min-width: 48vw !important;
-      flex-basis: 48vw;
-      min-height: 66vh;
+    .container {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
   @media (min-width: 1280px) {
-    .brands-section {
-      min-width: 40vw !important;
-      flex-basis: 40vw;
-      min-height: 68vh;
+    .container {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
   @media (min-width: 1536px) {
-    .brands-section {
-      min-width: 34vw !important;
-      flex-basis: 34vw;
-      min-height: 70vh;
+    .container {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
   .container section p {
     width: 100%;
   }
 </style>
-
-<script>
-  import gsap from 'gsap';
-  import { ScrollTrigger } from 'gsap/ScrollTrigger';
-  gsap.registerPlugin(ScrollTrigger);
-  const wrapper = document.querySelector('.brands-wrapper') as HTMLElement | null;
-  const container = document.querySelector('.container') as HTMLElement | null;
-
-  if (wrapper && container) {
-    const getScrollAmount = () => Math.max(0, container.scrollWidth - wrapper.clientWidth);
-
-    gsap.to(container, {
-      x: () => -getScrollAmount(),
-      ease: 'none',
-      scrollTrigger: {
-        trigger: wrapper,
-        start: 'top top',
-        pin: true,
-        scrub: 1,
-        end: () => `+=${getScrollAmount()}`,
-        invalidateOnRefresh: true,
-      },
-    });
-  }
-</script>

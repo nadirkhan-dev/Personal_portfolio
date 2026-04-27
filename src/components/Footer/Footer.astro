@@ -4,7 +4,7 @@ import CopyRights from './CopyRights.astro';
 ---
 
 <section
-  class="fixed_footer bg-darkBackground md:flex md:items-center md:gap-[5vw] px-pageXMobile md:px-pageX pt-[60%] pb-[60px] md:pb-[90px] lg:pt-[110px] w-full"
+  class="fixed_footer bg-darkBackground md:flex md:items-center md:gap-[5vw] px-pageXMobile md:px-pageX pt-[110px] pb-[60px] md:pb-[90px] w-full"
 >
   <div>
     <h2
@@ -64,9 +64,7 @@ import CopyRights from './CopyRights.astro';
 
 <style>
   .fixed_footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    z-index: -100;
+    position: relative;
+    z-index: 1;
   }
 </style>

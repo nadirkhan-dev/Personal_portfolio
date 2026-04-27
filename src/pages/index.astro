@@ -8,19 +8,38 @@ import MouseTrailer from '../components/MouseTrailer/MouseTrailer.astro';
 import WhyWorkWithMe from '../components/WhyWorkWithMe/WhyWorkWithMe.astro';
 import Marquee from '../components/Marquee/Marquee.astro';
 import Preloader from '../components/Preloader/Preloader.astro';
+import Projects from '../components/Projects/Projects.astro';
 ---
 
 <Layout title="Nadir Khan">
   <Preloader />
   <MouseTrailer />
-  <HeroSection />
+  <div class="section-reveal">
+    <HeroSection />
+  </div>
   <div class="block md:hidden">
     <Marquee text="The Story I told my wife" />
   </div>
   <Story />
-  <Marquee text="A Developer With Magical Touch" />
-  <WhyWorkWithMe />
-  <Marquee text="Lorem ipsum dolor? Just Kidding" />
-  <Summary />
-  <Footer />
+  <div class="section-reveal">
+    <Marquee text="My Projects I Work On" />
+  </div>
+  <div class="section-reveal">
+    <Projects />
+  </div>
+  <div class="section-reveal">
+    <Marquee text="A Developer With Magical Touch" />
+  </div>
+  <div class="section-reveal">
+    <WhyWorkWithMe />
+  </div>
+  <div class="section-reveal">
+    <Marquee text="Lorem ipsum dolor? Just Kidding" />
+  </div>
+  <div class="section-reveal">
+    <Summary />
+  </div>
+  <div class="section-reveal">
+    <Footer />
+  </div>
 </Layout>

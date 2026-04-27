@@ -6,8 +6,10 @@ type Project = {
   name: string;
   category: string;
   description: string;
-  url: string;
-  videoUrl: string;
+  url?: string;
+  links?: { label: string; url: string }[];
+  posterImage: string;
+  videoUrl?: string;
 };
 
 interface ProjectsProps {
@@ -17,6 +19,7 @@ interface ProjectsProps {
 }
 
 const { project, index, totalLength } = Astro.props;
+const primaryUrl = project.links?.[0]?.url ?? project.url ?? '#';
 ---
 
 <section
@@ -60,45 +63,81 @@ const { project, index, totalLength } = Astro.props;
           >
             {project.description}
           </div>
-          <a
-            href={project.url}
-            class="interactable interactable-link"
-            target="_blank"
-            role="button"
-            aria-label="See in action"
-          >
-            <div
-              class="border-black border-2 text-black px-6 py-4 w-max rounded-full text-[16px] group font-bold uppercase leading-[1.5rem] hidden lg:flex items-center gap-2 transition-all"
-            >
-              See in action <span
-                ><Icon
-                  name="gg:arrow-right"
-                  class="w-[30px] group-hover:-rotate-45 transition-all"
-                /></span
+          {
+            project.links && project.links.length > 0 ? (
+              <div class="hidden lg:flex flex-wrap gap-3">
+                {project.links.map((link) => (
+                  <a
+                    href={link.url}
+                    class="interactable interactable-link"
+                    target="_blank"
+                    role="button"
+                    aria-label={link.label}
+                  >
+                    <div class="border-black border-2 text-black px-6 py-4 w-max rounded-full text-[14px] md:text-[16px] group font-bold uppercase leading-[1.5rem] flex items-center gap-2 transition-all">
+                      {link.label}
+                      <span>
+                        <Icon
+                          name="gg:arrow-right"
+                          class="w-[26px] group-hover:-rotate-45 transition-all"
+                        />
+                      </span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <a
+                href={primaryUrl}
+                class="interactable interactable-link"
+                target="_blank"
+                role="button"
+                aria-label="See in action"
               >
-            </div>
-          </a>
+                <div class="border-black border-2 text-black px-6 py-4 w-max rounded-full text-[16px] group font-bold uppercase leading-[1.5rem] hidden lg:flex items-center gap-2 transition-all">
+                  See in action
+                  <span>
+                    <Icon
+                      name="gg:arrow-right"
+                      class="w-[30px] group-hover:-rotate-45 transition-all"
+                    />
+                  </span>
+                </div>
+              </a>
+            )
+          }
         </div>
         <!-- project video -->
         <div class="w-full flex-1">
           <a
-            href={project.url}
+            href={primaryUrl}
             aria-label={project.name}
             class="interactable interactable-link"
             target="_blank"
           >
-            <video
-              poster={project.posterImage}
-              class="project-video lazy w-full h-[auto]"
-              loop
-              data-src={project.videoUrl}
-              muted
-              playsinline
-              preload="auto"
-            >
-              <source data-src={project.videoUrl} type="video/mp4" />
-               Your browser does not support the video tag.
-            </video>
+            {
+              project.videoUrl ? (
+                <video
+                  poster={project.posterImage}
+                  class="project-video lazy w-full h-[auto]"
+                  loop
+                  data-src={project.videoUrl}
+                  muted
+                  playsinline
+                  preload="auto"
+                >
+                  <source data-src={project.videoUrl} type="video/mp4" />
+                   Your browser does not support the video tag.
+                </video>
+              ) : (
+                <img
+                  src={project.posterImage}
+                  alt={`${project.name} preview`}
+                  class="w-full h-auto"
+                  loading="lazy"
+                />
+              )
+            }
           </a>
         </div>
       </div>
