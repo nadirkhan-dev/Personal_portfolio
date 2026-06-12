@@ -17,5 +17,12 @@ pnpm-debug.log*
 .env
 .env.production
 
+# SSH keys / secrets (never commit)
+SSH-key
+SSH-key.pub
+*.pem
+id_rsa
+id_ed25519
+
 # macOS-specific files
 .DS_Store
