@@ -1,6 +1,9 @@
 # build output
 dist/
 
+# vercel (local project link metadata — do not commit)
+.vercel
+
 # generated types
 .astro/
 
