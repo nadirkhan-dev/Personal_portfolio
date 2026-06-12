@@ -12,7 +12,7 @@ const { title } = Astro.props;
     <meta charset="UTF-8" />
     <meta
       name="description"
-      content="React Native + Full Stack Developer with practical experience in building responsive and dynamic web and mobile applications."
+      content="Full Stack JavaScript Developer with production experience building modern web applications, e-commerce platforms, shipping systems, and API-driven services with Vue.js, React.js, Next.js, Node.js, and Express.js."
     />
     <meta name="viewport" content="width=device-width" />
     <meta property="og:title" content="Nadir Khan" />
@@ -20,16 +20,16 @@ const { title } = Astro.props;
     <meta property="og:type" content="website" />
     <meta
       property="og:description"
-      content="React Native + Full Stack Developer with practical experience in building responsive and dynamic web and mobile applications."
+      content="Full Stack JavaScript Developer with production experience building modern web applications, e-commerce platforms, shipping systems, and API-driven services with Vue.js, React.js, Next.js, Node.js, and Express.js."
     />
-    <meta property="og:image" content="/og-image.webp" />
+    <meta property="og:image" content={new URL(`${import.meta.env.BASE_URL}og-image.webp`, Astro.site)} />
     <meta property="og:site_name" content="Nadir Khan's Portfolio" />
     <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@noahkhan47" />
     <meta name="twitter:creator" content="@noahkhan47" />
 
-    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="icon" type="image/png" href={`${import.meta.env.BASE_URL}logo.png`} />
     <!-- font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

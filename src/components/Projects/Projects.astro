@@ -15,13 +15,21 @@ type Project = {
 
 const fallbackProjects: Project[] = [
   {
+    _id: 'liberty-supply-connect',
+    name: 'Liberty Supply Connect',
+    category: 'Internal Enterprise Platform',
+    description:
+      'Internal enterprise platform for Liberty Supply, a commercial HVAC parts distributor. Built with Nuxt 4, Vue 3, TypeScript, PrimeVue 4, and Pinia on a Directus CMS backend — with FedEx/UPS carrier integrations, real-time rate calculation, label generation, and embedded Looker analytics dashboards.',
+    url: 'https://libertysupply.com',
+    links: [{ label: 'Visit Website', url: 'https://libertysupply.com' }],
+    posterImage: '/projects/liberty-connect.png',
+  },
+  {
     _id: 'smart-attendance-hr',
     name: 'Smart Attendance — HR Portal',
     category: 'Web App',
     description:
       'HR portal for employee management, shift scheduling, attendance tracking, and approval workflows.',
-    url: 'https://smart-attendance-portal-web.onrender.com',
-    links: [{ label: 'HR Portal', url: 'https://smart-attendance-portal-web.onrender.com' }],
     posterImage: '/hero-image.webp',
     videoUrl: '/projects/hr.mp4',
   },
@@ -31,8 +39,6 @@ const fallbackProjects: Project[] = [
     category: 'Admin Console',
     description:
       'Super Admin portal for onboarding organizations, managing HR users, and system-wide configuration.',
-    url: 'https://smart-attendance-portal-admin.onrender.com',
-    links: [{ label: 'Admin Portal', url: 'https://smart-attendance-portal-admin.onrender.com' }],
     posterImage: '/hero-image.webp',
     videoUrl: '/projects/admin.mp4',
   },
@@ -42,8 +48,6 @@ const fallbackProjects: Project[] = [
     category: 'Employee Experience',
     description:
       'Employee-facing portal to view shifts, track attendance history, and submit WFH or shift requests.',
-    url: 'https://smart-attendance-portal-web.onrender.com',
-    links: [{ label: 'Employee Portal', url: 'https://smart-attendance-portal-web.onrender.com' }],
     posterImage: '/hero-image.webp',
     videoUrl: '/projects/emp.mp4',
   },

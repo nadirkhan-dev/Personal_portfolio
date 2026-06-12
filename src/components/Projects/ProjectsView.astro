@@ -19,7 +19,15 @@ interface ProjectsProps {
 }
 
 const { project, index, totalLength } = Astro.props;
-const primaryUrl = project.links?.[0]?.url ?? project.url ?? '#';
+const primaryUrl = project.links?.[0]?.url ?? project.url;
+const hasLink = Boolean(primaryUrl);
+
+// Prepend the site base path to local public assets (leave absolute http(s) URLs untouched)
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const withBase = (path?: string) =>
+  path && path.startsWith('/') ? `${base}${path}` : path;
+const posterSrc = withBase(project.posterImage);
+const videoSrc = withBase(project.videoUrl);
 ---
 
 <section
@@ -86,7 +94,7 @@ const primaryUrl = project.links?.[0]?.url ?? project.url ?? '#';
                   </a>
                 ))}
               </div>
-            ) : (
+            ) : hasLink ? (
               <a
                 href={primaryUrl}
                 class="interactable interactable-link"
@@ -104,41 +112,61 @@ const primaryUrl = project.links?.[0]?.url ?? project.url ?? '#';
                   </span>
                 </div>
               </a>
-            )
+            ) : null
           }
         </div>
         <!-- project video -->
         <div class="w-full flex-1">
-          <a
-            href={primaryUrl}
-            aria-label={project.name}
-            class="interactable interactable-link"
-            target="_blank"
-          >
-            {
-              project.videoUrl ? (
+          {hasLink ? (
+            <a
+              href={primaryUrl}
+              aria-label={project.name}
+              class="interactable interactable-link"
+              target="_blank"
+            >
+              {project.videoUrl ? (
                 <video
-                  poster={project.posterImage}
+                  poster={posterSrc}
                   class="project-video lazy w-full h-[auto]"
                   loop
-                  data-src={project.videoUrl}
+                  data-src={videoSrc}
                   muted
                   playsinline
                   preload="auto"
                 >
-                  <source data-src={project.videoUrl} type="video/mp4" />
-                   Your browser does not support the video tag.
+                  <source data-src={videoSrc} type="video/mp4" />
+                  Your browser does not support the video tag.
                 </video>
               ) : (
                 <img
-                  src={project.posterImage}
+                  src={posterSrc}
                   alt={`${project.name} preview`}
                   class="w-full h-auto"
                   loading="lazy"
                 />
-              )
-            }
-          </a>
+              )}
+            </a>
+          ) : project.videoUrl ? (
+            <video
+              poster={posterSrc}
+              class="project-video lazy w-full h-[auto]"
+              loop
+              data-src={videoSrc}
+              muted
+              playsinline
+              preload="auto"
+            >
+              <source data-src={videoSrc} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          ) : (
+            <img
+              src={posterSrc}
+              alt={`${project.name} preview`}
+              class="w-full h-auto"
+              loading="lazy"
+            />
+          )}
         </div>
       </div>
     </div>

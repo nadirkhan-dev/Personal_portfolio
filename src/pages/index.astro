@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import HeroSection from '../components/Hero/HeroSection.astro';
-import Story from '../components/Story/Story.astro';
+// import Story from '../components/Story/Story.astro';
 import Summary from '../components/Summary/Summary.astro';
 import Footer from '../components/Footer/Footer.astro';
 import MouseTrailer from '../components/MouseTrailer/MouseTrailer.astro';
@@ -17,10 +17,12 @@ import Projects from '../components/Projects/Projects.astro';
   <div class="section-reveal">
     <HeroSection />
   </div>
+  {/* Story section — temporarily disabled (commented out, not removed)
   <div class="block md:hidden">
     <Marquee text="The Story I told my wife" />
   </div>
   <Story />
+  */}
   <div class="section-reveal">
     <Marquee text="My Projects I Work On" />
   </div>
