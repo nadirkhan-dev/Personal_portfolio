@@ -13,19 +13,13 @@ const {
 // https://astro.build/config
 const hasSanityEnv = Boolean(PUBLIC_SANITY_PROJECT_ID) && Boolean(PUBLIC_SANITY_DATASET);
 
-// Vercel serves from the domain root; GitHub Pages serves under /Personal_portfolio/.
-// Detect Vercel builds so the base path (and asset URLs) are correct on each host.
-const isVercel = Boolean(process.env.VERCEL);
+// Deployed on Vercel, which serves from the domain root.
 const vercelUrl =
   process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL;
 
 export default defineConfig({
-  site: isVercel
-    ? vercelUrl
-      ? `https://${vercelUrl}`
-      : "https://nadirkhan-dev.github.io"
-    : "https://nadirkhan-dev.github.io",
-  base: isVercel ? "/" : "/Personal_portfolio/",
+  site: vercelUrl ? `https://${vercelUrl}` : "https://nadirkhan-dev.vercel.app",
+  base: "/",
   integrations: [tailwind(),
     partytown({
       config: {
