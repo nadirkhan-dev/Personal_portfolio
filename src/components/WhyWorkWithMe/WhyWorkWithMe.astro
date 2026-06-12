@@ -6,7 +6,7 @@ import Flower from './Flower.astro';
   class="brands-wrapper bg-black px-pageXMobile md:px-pageX text-white overflow-x-hidden relative z-40 min-h-screen flex items-center"
 >
   <div
-    class="container gap-4 md:gap-8 py-[12vh] md:py-[14vh] items-stretch"
+    class="brands-grid gap-4 md:gap-8 py-[12vh] md:py-[14vh] items-stretch"
     id="why-work-with-me"
   >
       <div
@@ -142,7 +142,7 @@ import Flower from './Flower.astro';
 </div>
 
 <style>
-  .container {
+  .brands-grid {
     display: grid;
     width: 100%;
     grid-template-columns: 1fr;
@@ -152,26 +152,26 @@ import Flower from './Flower.astro';
     min-height: auto;
   }
   @media (min-width: 768px) {
-    .container {
+    .brands-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
   @media (min-width: 1024px) {
-    .container {
+    .brands-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
   @media (min-width: 1280px) {
-    .container {
+    .brands-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
   @media (min-width: 1536px) {
-    .container {
+    .brands-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
-  .container section p {
+  .brands-grid section p {
     width: 100%;
   }
 </style>
