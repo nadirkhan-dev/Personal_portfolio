@@ -1,6 +1,7 @@
 <div
   id="mouse-trailer"
   class="hidden relative lg:flex items-center justify-center"
+  aria-hidden="true"
 >
   <span 
     id="mouse-trailer__icon"
@@ -84,54 +85,96 @@
       fill: 'forwards',
     });
   };
-  document.addEventListener('mousemove', (e) => {
-    // get all interactive classes that are defined in HTML
-    const interactableLink = e?.target?.closest('.interactable-link'),
-      interactingLink = interactableLink !== null;
-    const interactableCopy = e?.target?.closest('.interactable-copy'),
-      interactingCopy = interactableCopy !== null;
-    const interactable = e?.target?.closest('.interactable'),
-      interacting = interactable !== null;
-    const lightBackground = e?.target?.closest('.dark-trailer'),
-      darkTrailer = lightBackground !== null;
+  /*
+   * INTERACTION TO NEXT PAINT (INP)
+   *
+   * Two problems with the previous version of this handler:
+   *
+   * 1. It ran four separate `closest()` DOM walks and started a Web Animation
+   *    on EVERY mousemove event. mousemove fires at pointer rate (often 120+/s),
+   *    so this was the dominant source of main-thread work on the page.
+   *    It now stores the latest event and does the work at most once per frame
+   *    inside requestAnimationFrame.
+   *
+   * 2. `interactableCopy.addEventListener('click', …)` ran inside the mousemove
+   *    handler, so a new click listener was attached on every single mouse move
+   *    over the email element. After a second of hovering, one click fired the
+   *    copy routine dozens of times and leaked every one of those listeners.
+   *    Copying is now handled by a single delegated listener registered once.
+   */
+  let latestEvent: MouseEvent | null = null;
+  let frameQueued = false;
 
-    // call mouse trailer function to animate trailer
-    animateMouseTrailer(
-      e,
-      interacting,
-      !!interacting && (interactingLink || interactingCopy),
-      darkTrailer
-    );
+  const render = () => {
+    frameQueued = false;
+    const e = latestEvent;
+    if (!e) return;
+
+    const target = e.target as Element | null;
+    if (!target || typeof target.closest !== 'function') return;
+
+    // One walk up the tree, reused for all four checks.
+    const interactableLink = target.closest('.interactable-link');
+    const interactableCopy = target.closest('.interactable-copy');
+    const interactable = target.closest('.interactable');
+    const darkTrailer = target.closest('.dark-trailer') !== null;
+
+    const interacting = interactable !== null;
+    const interactingLink = interactableLink !== null;
+    const interactingCopy = interactableCopy !== null;
+
+    animateMouseTrailer(e, interacting, interacting && (interactingLink || interactingCopy), darkTrailer);
 
     if (!interacting) {
       mouseTrailerIcon?.style.setProperty('display', 'none');
       mouseTrailerCopy?.style.setProperty('display', 'none');
       return;
-    } else {
-      // check if element has link class
-      if (interactingLink) {
-        mouseTrailerIcon?.style.setProperty('display', 'block');
-        mouseTrailerCopy?.style.setProperty('display', 'none');
-        return;
-      }
-      // check if element has copy class
-      if (interactingCopy) {
-        mouseTrailerIcon?.style.setProperty('display', 'none');
-        mouseTrailerCopy?.style.setProperty('display', 'block');
-        // copy the text to clipboard on mouse click
-        interactableCopy.addEventListener('click', () => {
-          const text = interactableCopy.textContent;
-          navigator?.clipboard?.writeText(text);
-          mouseTrailerCopy?.style.setProperty('display', 'none');
-          mouseTrailerCopySuccessIcon?.style.setProperty('opacity', '1');
-          setTimeout(() => {
-            mouseTrailerCopySuccessIcon?.style.setProperty('opacity', '0');
-            mouseTrailerCopy?.style.setProperty('display', 'block');
-          }, 2000);
-        });
-        //
-        return;
-      }
     }
+
+    if (interactingLink) {
+      mouseTrailerIcon?.style.setProperty('display', 'block');
+      mouseTrailerCopy?.style.setProperty('display', 'none');
+      return;
+    }
+
+    if (interactingCopy) {
+      mouseTrailerIcon?.style.setProperty('display', 'none');
+      mouseTrailerCopy?.style.setProperty('display', 'block');
+      return;
+    }
+
+    mouseTrailerIcon?.style.setProperty('display', 'none');
+    mouseTrailerCopy?.style.setProperty('display', 'none');
+  };
+
+  document.addEventListener(
+    'mousemove',
+    (e) => {
+      latestEvent = e;
+      if (!frameQueued) {
+        frameQueued = true;
+        requestAnimationFrame(render);
+      }
+    },
+    { passive: true }
+  );
+
+  // Registered exactly once, using event delegation.
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element | null;
+    const copyTarget = target?.closest?.('.interactable-copy');
+    if (!copyTarget) return;
+
+    const text = copyTarget.textContent?.trim();
+    if (!text) return;
+
+    void navigator?.clipboard?.writeText(text).then(() => {
+      mouseTrailerCopy?.style.setProperty('display', 'none');
+      mouseTrailerCopySuccessIcon?.style.setProperty('opacity', '1');
+      setTimeout(() => {
+        mouseTrailerCopySuccessIcon?.style.setProperty('opacity', '0');
+        mouseTrailerCopy?.style.setProperty('display', 'block');
+      }, 2000);
+    });
   });
 </script>

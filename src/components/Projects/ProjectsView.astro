@@ -1,16 +1,6 @@
 ---
 import Icon from 'astro-icon';
-
-type Project = {
-  _id: string;
-  name: string;
-  category: string;
-  description: string;
-  url?: string;
-  links?: { label: string; url: string }[];
-  posterImage: string;
-  videoUrl?: string;
-};
+import type { Project } from '../../data/projects';
 
 interface ProjectsProps {
   project: Project;
@@ -22,15 +12,25 @@ const { project, index, totalLength } = Astro.props;
 const primaryUrl = project.links?.[0]?.url ?? project.url;
 const hasLink = Boolean(primaryUrl);
 
-// Prepend the site base path to local public assets (leave absolute http(s) URLs untouched)
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const withBase = (path?: string) =>
-  path && path.startsWith('/') ? `${base}${path}` : path;
-const posterSrc = withBase(project.posterImage);
-const videoSrc = withBase(project.videoUrl);
+const posterSrc = project.posterImage;
+const videoSrc = project.videoUrl;
+
+// Intrinsic dimensions, used to reserve the exact layout box before the media
+// loads. Without these the page reflows as each poster arrives — the main
+// source of Cumulative Layout Shift on this page.
+const posterWidth = project.posterWidth ?? 1280;
+const posterHeight = project.posterHeight ?? 720;
+
+const headingId = `project-${project._id}-title`;
 ---
 
-<section
+{/*
+  Was <section> wrapping <div>s. Each project is a self-contained, independently
+  distributable piece of content, which is exactly what <article> means. It is
+  labelled by its own heading so screen readers announce "article, <project name>".
+*/}
+<article
+  aria-labelledby={headingId}
   class:list={[
     'project-section bg-white px-pageXMobile md:px-pageX relative',
     { 'pt-[40px] md:pt-[0px]': index === 0 },
@@ -45,32 +45,36 @@ const videoSrc = withBase(project.videoUrl);
   >
     <div>
       <!-- project section -->
-      <div
-        class="flex flex-col lg:flex-row items-center gap-0 md:gap-10 lg:gap-40"
-      >
+      <div class="flex flex-col lg:flex-row items-center gap-0 md:gap-10 lg:gap-40">
         <!-- project description -->
         <div class="max-w-full w-full lg:max-w-[30%] flex flex-col">
-          <div
+          <p
             class="reveal-type text-background hidden lg:block text-[1rem] font-[700] mb-7 leading-[1.5rem] uppercase"
           >
             Project
-          </div>
-          <div
+          </p>
+          {/*
+            Was a <div>. Project names are the most valuable keyword-bearing text
+            in this section; as a real <h3> they sit correctly under the section's
+            <h2> and are treated as headings rather than anonymous text.
+          */}
+          <h3
+            id={headingId}
             class="reveal-type text-background text-[35px] md:text-[50px] lg:text-[4rem]
              font-bold uppercase leading-[40px] md:leading-[65px] mb-[30px] md:mb-[20px] lg:mb-8"
           >
             {project.name}
-          </div>
-          <div
+          </h3>
+          <p
             class="hidden reveal-type text-background text-[16px] capitalize mb-[30px] md:mb-[20px] lg:mb-8"
           >
             {project.category}
-          </div>
-          <div
+          </p>
+          <p
             class="reveal-type text-[1rem] md:text-[20px] block lg:text-[22px] md:leading[30px] lg:leading-[27px] mb-8 text-background"
           >
             {project.description}
-          </div>
+          </p>
           {
             project.links && project.links.length > 0 ? (
               <div class="hidden lg:flex flex-wrap gap-3">
@@ -79,10 +83,10 @@ const videoSrc = withBase(project.videoUrl);
                     href={link.url}
                     class="interactable interactable-link"
                     target="_blank"
-                    role="button"
-                    aria-label={link.label}
+                    rel="noopener noreferrer"
+                    aria-label={`${link.label} — ${project.name} (opens in a new tab)`}
                   >
-                    <div class="border-black border-2 text-black px-6 py-4 w-max rounded-full text-[14px] md:text-[16px] group font-bold uppercase leading-[1.5rem] flex items-center gap-2 transition-all">
+                    <span class="border-black border-2 text-black px-6 py-4 w-max rounded-full text-[14px] md:text-[16px] group font-bold uppercase leading-[1.5rem] flex items-center gap-2 transition-all">
                       {link.label}
                       <span>
                         <Icon
@@ -90,7 +94,7 @@ const videoSrc = withBase(project.videoUrl);
                           class="w-[26px] group-hover:-rotate-45 transition-all"
                         />
                       </span>
-                    </div>
+                    </span>
                   </a>
                 ))}
               </div>
@@ -99,10 +103,10 @@ const videoSrc = withBase(project.videoUrl);
                 href={primaryUrl}
                 class="interactable interactable-link"
                 target="_blank"
-                role="button"
-                aria-label="See in action"
+                rel="noopener noreferrer"
+                aria-label={`See ${project.name} in action (opens in a new tab)`}
               >
-                <div class="border-black border-2 text-black px-6 py-4 w-max rounded-full text-[16px] group font-bold uppercase leading-[1.5rem] hidden lg:flex items-center gap-2 transition-all">
+                <span class="border-black border-2 text-black px-6 py-4 w-max rounded-full text-[16px] group font-bold uppercase leading-[1.5rem] hidden lg:flex items-center gap-2 transition-all">
                   See in action
                   <span>
                     <Icon
@@ -110,29 +114,34 @@ const videoSrc = withBase(project.videoUrl);
                       class="w-[30px] group-hover:-rotate-45 transition-all"
                     />
                   </span>
-                </div>
+                </span>
               </a>
             ) : null
           }
         </div>
-        <!-- project video -->
+
+        <!-- project media -->
         <div class="w-full flex-1">
           {hasLink ? (
             <a
               href={primaryUrl}
-              aria-label={project.name}
-              class="interactable interactable-link"
+              aria-label={`${project.name} (opens in a new tab)`}
+              class="interactable interactable-link block"
               target="_blank"
+              rel="noopener noreferrer"
             >
-              {project.videoUrl ? (
+              {videoSrc ? (
                 <video
                   poster={posterSrc}
-                  class="project-video lazy w-full h-[auto]"
+                  class="project-video lazy w-full h-auto"
+                  width={posterWidth}
+                  height={posterHeight}
                   loop
                   data-src={videoSrc}
                   muted
                   playsinline
-                  preload="auto"
+                  preload="none"
+                  aria-label={`Screen recording of ${project.name}`}
                 >
                   <source data-src={videoSrc} type="video/mp4" />
                   Your browser does not support the video tag.
@@ -140,21 +149,27 @@ const videoSrc = withBase(project.videoUrl);
               ) : (
                 <img
                   src={posterSrc}
-                  alt={`${project.name} preview`}
+                  alt={`Screenshot of ${project.name} built by Nadir Khan`}
                   class="w-full h-auto"
+                  width={posterWidth}
+                  height={posterHeight}
                   loading="lazy"
+                  decoding="async"
                 />
               )}
             </a>
-          ) : project.videoUrl ? (
+          ) : videoSrc ? (
             <video
               poster={posterSrc}
-              class="project-video lazy w-full h-[auto]"
+              class="project-video lazy w-full h-auto"
+              width={posterWidth}
+              height={posterHeight}
               loop
               data-src={videoSrc}
               muted
               playsinline
-              preload="auto"
+              preload="none"
+              aria-label={`Screen recording of ${project.name}`}
             >
               <source data-src={videoSrc} type="video/mp4" />
               Your browser does not support the video tag.
@@ -162,16 +177,19 @@ const videoSrc = withBase(project.videoUrl);
           ) : (
             <img
               src={posterSrc}
-              alt={`${project.name} preview`}
+              alt={`Screenshot of ${project.name} built by Nadir Khan`}
               class="w-full h-auto"
+              width={posterWidth}
+              height={posterHeight}
               loading="lazy"
+              decoding="async"
             />
           )}
         </div>
       </div>
     </div>
   </div>
-</section>
+</article>
 
 <script>
   import gsap from 'gsap';
@@ -180,54 +198,59 @@ const videoSrc = withBase(project.videoUrl);
   import SplitType from 'split-type';
   gsap.registerPlugin(ScrollTrigger);
 
-  // selecting all the text with reaveal-type class
-  const splitTypes = document.querySelectorAll('.reveal-type');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  splitTypes.forEach((char) => {
-    const text = new SplitType(char, { types: 'lines' });
+  if (!prefersReducedMotion) {
+    // Line-by-line reveal for text marked with .reveal-type
+    const splitTypes = document.querySelectorAll('.reveal-type');
 
-    gsap.from(text.lines, {
-      scrollTrigger: {
-        trigger: char,
-        start: 'top 80%',
-        end: 'top 40%',
-        scrub: false,
-      },
-      ease: 'power4.out',
-      scaleY: 0,
-      y: 50,
-      transformOrigin: 'top',
-      stagger: 0.2,
-      duration: 0.5,
+    splitTypes.forEach((char) => {
+      const text = new SplitType(char as HTMLElement, { types: 'lines' });
+
+      gsap.from(text.lines, {
+        scrollTrigger: {
+          trigger: char,
+          start: 'top 80%',
+          end: 'top 40%',
+          scrub: false,
+        },
+        ease: 'power4.out',
+        scaleY: 0,
+        y: 50,
+        transformOrigin: 'top',
+        stagger: 0.2,
+        duration: 0.5,
+      });
     });
-  });
+  }
 
-  const lazy = new LazyLoad({
-    threshold: 1500,
-  });
+  // Threshold reduced from 1500px to 300px. The videos are 11–12 MB each; the
+  // old value started downloading all of them almost immediately, competing
+  // with the hero image for bandwidth and wrecking LCP on slower connections.
+  const lazy = new LazyLoad({ threshold: 300 });
   lazy.update();
 
-  // only play the video when it is in the viewport
-  document.addEventListener('DOMContentLoaded', () => {
-    const videos = document.querySelectorAll('.project-video');
+  // Play a project video only while it is on screen, and only once its source
+  // has actually been swapped in by LazyLoad.
+  const videos = document.querySelectorAll<HTMLVideoElement>('.project-video');
 
-    const handleIntersection = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
-      entries.forEach((entry: IntersectionObserverEntry) => {
-        const video = entry.target as HTMLVideoElement;
-        if (entry.isIntersecting) {
-          video.play();
-        } else {
-          video.pause();
-        }
-      });
-    };
+  if (videos.length > 0) {
+    const videoObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target as HTMLVideoElement;
+          if (entry.isIntersecting) {
+            // play() rejects if the media is not ready or autoplay is blocked;
+            // an unhandled rejection here surfaces as a console error.
+            void video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
 
-    const videoObserver = new IntersectionObserver(handleIntersection, {
-      threshold: 0.2, // Adjust the threshold as needed (between 0 and 1)
-    });
-
-    videos.forEach((video) => {
-      videoObserver.observe(video);
-    });
-  });
+    videos.forEach((video) => videoObserver.observe(video));
+  }
 </script>

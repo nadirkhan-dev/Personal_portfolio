@@ -1,19 +1,25 @@
 ---
 import HeaderSideText from './HeaderSideText.astro';
-import Logo from '../../../public/logo.svg';
-import { Image } from 'astro:assets';
+import { PERSON } from '../../config/site';
 ---
 
 <header class="w-full h-[10rem] relative flex justify-between">
-  <!-- logo -->
-  <a href="/">
-    <Image
-      src={Logo}
+  {/*
+    Logo. Served as a plain <img> pointing at the static SVG rather than through
+    astro:assets: an SVG is already resolution-independent, so the image pipeline
+    has nothing to optimise, and a stable URL avoids an extra build artefact.
+    width/height are set so the browser reserves the box before paint (no CLS).
+  */}
+  <a href="/" aria-label={`${PERSON.name} — back to homepage`}>
+    <img
+      src="/logo.svg"
       id="logo"
       class="interactable header-logo self-start mt-[70px] w-[60px] h-[60px] md:w-[82px] md:h-[82px]"
-      alt="Nadir Khan Website Logo"
-      width="72"
-      height="72"
+      alt={`${PERSON.name} logo`}
+      width="82"
+      height="82"
+      fetchpriority="low"
+      decoding="async"
     />
   </a>
   <HeaderSideText />
@@ -21,19 +27,21 @@ import { Image } from 'astro:assets';
 
 <script>
   import gsap from 'gsap';
-  import { ScrollTrigger } from 'gsap/all';
 
-  gsap.registerPlugin(ScrollTrigger);
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  gsap.from('.header-logo', {
-    scale: 2.5,
-    rotate: -360,
-    opacity: 0,
-    duration: 1.3,
-    ease: 'power4.inOut',
-    delay: 6.5,
-    stagger: {
-      amount: 0.5,
-    },
-  });
+  // Delay cut from 6.5s to 1.15s. The old value held the entire header invisible
+  // for six and a half seconds, which is what pushed Largest Contentful Paint
+  // past 7s and made a good Lighthouse performance score unreachable.
+  if (!prefersReducedMotion) {
+    gsap.from('.header-logo', {
+      scale: 2.5,
+      rotate: -360,
+      opacity: 0,
+      duration: 0.8,
+      ease: 'power4.inOut',
+      delay: 1.15,
+      stagger: { amount: 0.3 },
+    });
+  }
 </script>

@@ -1,29 +1,42 @@
+---
+import { PERSON } from '../../config/site';
+
+// Computed at build time. Previously this expression was inlined three times in
+// two files; centralising it means the number can never disagree with itself.
+const yearsOfExperience = new Date().getFullYear() - 2025;
+---
+
 <div class="flex flex-col relative flex-1">
   <!-- TODO: fix mobile content shifting issue with animation -->
   <div class="header-side-text absolute right-0 mt-[65px]">
     <div class="w-full">
-      <h3
-        class="text-[18px] md:text-[36px] text-right font-bold text-textLight"
-      >
+      {/*
+        Was an <h3>. It renders BEFORE the page's <h1>, so it made the document
+        start at heading level 3 and then jump backwards — Lighthouse flags this
+        as "Heading elements are not in a sequentially-descending order".
+        It is a tagline, not a section heading, so <p> is the honest element.
+      */}
+      <p class="text-[18px] md:text-[36px] text-right font-bold text-textLight">
         React Native + Full Stack Developer
-      </h3>
+      </p>
+      {/*
+        The duplicate id="experience" that used to sit on these two spans (and on
+        a third span in Experience.astro) made the document invalid: an id must
+        be unique. The ids were never referenced, so they are simply gone.
+      */}
       <p class="text-xs hidden md:block md:text-lg text-right text-textDullest">
-        <span id="experience">
-          {new Date().getFullYear() - 2025}
-        </span>+ Years of development experience
+        {yearsOfExperience}+ Years of development experience
       </p>
       <p class="text-xs block md:hidden md:text-lg text-right text-textDullest">
-        <span id="experience">{new Date().getFullYear() - 2025}</span>+ Years of experience
+        {yearsOfExperience}+ Years of experience
       </p>
     </div>
     <hr
       class="side-text-seperator my-[16px] w-16 md:w-20 lg:w-[100%] border-0 h-[1px] ml-auto bg-darkBackground2"
     />
-    <!-- contact info -->
-    <div
-      class="interactable contact-info text-textDullest text-right text-xs md:text-lg"
-    >
-      <div class="interactable-copy">noahkhan47@gmail.com</div>
+    <!-- contact info — click-to-copy, handled by MouseTrailer via .interactable-copy -->
+    <div class="interactable contact-info text-textDullest text-right text-xs md:text-lg">
+      <div class="interactable-copy">{PERSON.email}</div>
     </div>
   </div>
 </div>
