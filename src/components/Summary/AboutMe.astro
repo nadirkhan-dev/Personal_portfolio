@@ -1,21 +1,32 @@
+---
+import { PERSON } from '../../config/site';
+---
+
 <section
+  id="about"
+  aria-labelledby="about-heading"
   class="about-me-section py-[70px] md:py-[80px] lg:py-[100px] flex flex-col lg:flex-row justify-between border-b border-darkBorder"
 >
   <div>
     <h2
+      id="about-heading"
       class="text-[30px] md:text-[50px] lg:text-[4rem] leading-[70px] lg:leading-[80px] font-bold mb-[30px] text-textLightPrimary"
     >
       About Me
     </h2>
-    <div
-      class="max-w-none lg:max-w-[310px] text-textDullest text-[1rem] leading-[1.5em] mb-[40px]"
-    >
-      I&apos;m a Full Stack JavaScript Developer based in Bahawalpur, Pakistan.
-      I build scalable web applications, e-commerce platforms, shipping systems,
-      and API-driven services with Vue 3 / Nuxt 4, React.js, Next.js, Node.js,
-      Express.js, and TypeScript. Passionate about clean code, performance
-      optimization, and seamless user experiences.
-    </div>
+    {/*
+      "I'm Nadir Khan, a Full Stack…" — the name now appears in body copy where
+      Google expects to find it. Previously the string "Nadir Khan" appeared
+      nowhere in the visible text of the entire page, which is the single
+      biggest reason the site would not rank for the person's own name.
+    */}
+    <p class="max-w-none lg:max-w-[310px] text-textDullest text-[1rem] leading-[1.5em] mb-[40px]">
+      I&apos;m {PERSON.name}, a Full Stack JavaScript Developer based in Bahawalpur,
+      Pakistan. I build scalable web applications, e-commerce platforms, shipping
+      systems, and API-driven services with Vue 3 / Nuxt 4, React.js, Next.js,
+      Node.js, Express.js, and TypeScript. Passionate about clean code,
+      performance optimization, and seamless user experiences.
+    </p>
   </div>
   <div
     class="ml-0 lg:ml-[80px] max-w-none md:max-w-[80%] lg:max-w-[61%] w-full"
@@ -25,15 +36,17 @@
     >
       I&apos;ve developed and worked for:
     </h3>
-    <div
-      class="text-[30px] md:text-[50px] lg:text-[4rem] leading-[40px] md:leading-[60px] lg:leading-[80px] text-textLightPrimary"
+    {/* <br>-separated text is now a real list: same rendering (block <li>s with
+      no markers), but assistive tech and crawlers see six discrete items. */}
+    <ul
+      class="list-none p-0 m-0 text-[30px] md:text-[50px] lg:text-[4rem] leading-[40px] md:leading-[60px] lg:leading-[80px] text-textLightPrimary"
     >
-      Algotix.ai <br />
-      Vue 3 / Nuxt 4 Apps <br />
-      React.js &amp; Next.js Apps <br />
-      Node.js / Express APIs <br />
-      Shipping &amp; E-commerce Platforms <br />
-      Scalable Frontend Components <br />
-    </div>
+      <li>Algotix.ai</li>
+      <li>Vue 3 / Nuxt 4 Apps</li>
+      <li>React.js &amp; Next.js Apps</li>
+      <li>Node.js / Express APIs</li>
+      <li>Shipping &amp; E-commerce Platforms</li>
+      <li>Scalable Frontend Components</li>
+    </ul>
   </div>
 </section>

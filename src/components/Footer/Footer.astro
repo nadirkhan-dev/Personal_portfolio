@@ -1,9 +1,18 @@
 ---
 import Character from './Character.astro';
 import CopyRights from './CopyRights.astro';
+import { PERSON, SOCIALS, STACKOVERFLOW_URL, RESUME_PATH } from '../../config/site';
+
+const linkClass =
+  'mr-[20px] relative text-[16px] leading-[24px] transition-all text-textDullest hover:text-darkBackground2 py-[15px]';
 ---
 
-<section
+{/*
+  Was <section>. This is the page's footer, so <footer> is the correct element —
+  it also produces the "contentinfo" landmark that screen-reader users navigate
+  to for contact details, and which Lighthouse checks for.
+*/}
+<footer
   class="fixed_footer bg-darkBackground md:flex md:items-center md:gap-[5vw] px-pageXMobile md:px-pageX pt-[110px] pb-[60px] md:pb-[90px] w-full"
 >
   <div>
@@ -12,55 +21,52 @@ import CopyRights from './CopyRights.astro';
     >
       Bug Me!
     </h2>
-    <!-- open email on click -->
 
     <a
-      href="mailto:noahkhan47@gmail.com"
+      href={`mailto:${PERSON.email}`}
       class="interactable interactable-link text-textLightPrimary text-center md:text-left block uppercase mb-[40px]"
-      >noahkhan47@gmail.com</a
+      aria-label={`Email ${PERSON.name}`}>{PERSON.email}</a
     >
-    <div
+
+    {/*
+      Wrapped in <nav>: this is a labelled set of navigation links, not a bare
+      div of anchors. Facebook and Instagram are included here so the profiles
+      declared in the JSON-LD `sameAs` array are also reachable as real,
+      crawlable links — Google cross-checks the two.
+    */}
+    <nav
+      aria-label={`${PERSON.name} profiles and documents`}
       class="interactable interactable-link text-center md:text-left mb-[20px] md:mb-[80px]"
     >
-      <a
-        href="https://www.linkedin.com/in/nadir-khan-3565b8353/"
-        aria-label="Checkout my Linkedin profile"
-        target="_blank"
-        class="mr-[20px] relative text-[16px] leading-[24px] text-textDullest hover:text-darkBackground2 py-[15px]"
-        >LinkedIn</a
-      >
-      <a
-        href="https://github.com/nadirkhan-dev"
-        aria-label="Checkout my Github profile"
-        target="_blank"
-        class="mr-[20px] relative text-[16px] leading-[24px] transition-all text-textDullest hover:text-darkBackground2 py-[15px]"
-        >Github</a
-      >
-      <a
-        href="https://stackoverflow.com/users/6900808/sami"
-        aria-label="Checkout my Stackoverflow profile"
-        target="_blank"
-        class="mr-[20px] relative text-[16px] leading-[24px] transition-all text-textDullest hover:text-darkBackground2 py-[15px]"
-        >Stackoverflow</a
-      >
-      <a
-        href={`${import.meta.env.BASE_URL}Nadir_Khan_CV.pdf`}
-        aria-label="Get my Resume"
-        rel="noopener noreferrer"
-        target="_blank"
-        class="mr-[20px] relative text-[16px] leading-[24px] transition-all text-textDullest hover:text-darkBackground2 py-[15px]"
-        >Resume</a
-      >
-    </div>
+      <a href={SOCIALS.linkedin} rel="noopener noreferrer me" target="_blank" class={linkClass}>
+        LinkedIn
+      </a>
+      <a href={SOCIALS.github} rel="noopener noreferrer me" target="_blank" class={linkClass}>
+        Github
+      </a>
+      <a href={SOCIALS.instagram} rel="noopener noreferrer me" target="_blank" class={linkClass}>
+        Instagram
+      </a>
+      <a href={SOCIALS.facebook} rel="noopener noreferrer me" target="_blank" class={linkClass}>
+        Facebook
+      </a>
+      <a href={STACKOVERFLOW_URL} rel="noopener noreferrer" target="_blank" class={linkClass}>
+        Stackoverflow
+      </a>
+      <a href={RESUME_PATH} rel="noopener noreferrer" target="_blank" class={linkClass}>
+        Resume
+      </a>
+    </nav>
+
     <!-- Moving Text -->
     <div class="flex justify-center md:block">
-      <CopyRights text="©Nadir. All Rights Reserved" />
+      <CopyRights text={`©${PERSON.name}. All Rights Reserved`} />
     </div>
   </div>
-  <div class="flex-1 opacity-[0.35] hidden md:block">
+  <div class="flex-1 opacity-[0.35] hidden md:block" aria-hidden="true">
     <Character />
   </div>
-</section>
+</footer>
 
 <style>
   .fixed_footer {

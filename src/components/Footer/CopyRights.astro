@@ -6,25 +6,24 @@ interface Props {
 const { text } = Astro.props;
 ---
 
-<button
+{/*
+  Was a <button> with role="button" and aria-live="polite". It is not
+  interactive — nothing happens on click — so announcing it as a button
+  promised an action that does not exist, and aria-live made screen readers
+  treat static copyright text as a live region. It is now a plain container.
+*/}
+<div
   class="interactable button button--surtur relative left-0 md:left-[calc(-1*(200px-160px))] md:bottom-[40px]"
-  aria-live="polite" 
-  role="button"
-  aria-label="Copyrights Nadir Khan"
 >
-  <svg class="textcircle w-[200px] md:w-[250px]" viewBox="0 0 500 500">
+  <svg class="textcircle w-[200px] md:w-[250px]" viewBox="0 0 500 500" role="img" aria-label={text}>
     <defs
       ><path
         id="textcircle"
         d="M250,400 a150,150 0 0,1 0,-300a150,150 0 0,1 0,300Z"></path></defs
     >
-    <text
-      ><textPath
-        xlink:href="#textcircle"
-        aria-label="Projects & client work 2020"
-        textLength="900">{text}</textPath
-      ></text
-    >
+    {/* The stale aria-label here read "Projects & client work 2020", which
+      overrode the real copyright text with unrelated wording. Removed. */}
+    <text><textPath xlink:href="#textcircle" textLength="900">{text}</textPath></text>
   </svg>
   <svg
     aria-hidden="true"
@@ -49,12 +48,9 @@ const { text } = Astro.props;
     <circle class="eye__iris" cx="35" cy="35.31" r="5.221"></circle>
     <circle class="eye__inner" cx="35" cy="35.31" r="10.041"></circle>
   </svg>
-</button>
+</div>
 
 <style>
-  li.content__item::marker {
-    display: none;
-  }
   .button {
     position: relative;
     display: inline-block;

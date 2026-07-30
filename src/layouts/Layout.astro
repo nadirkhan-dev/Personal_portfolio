@@ -1,71 +1,143 @@
 ---
+import BaseHead from '../components/SEO/BaseHead.astro';
+import { SITE } from '../config/site';
+
+/*
+ * Fonts: the Manrope variable woff2 is copied from @fontsource-variable/manrope
+ * into /public/fonts and declared with @font-face below, rather than imported.
+ * An import would emit a content-hashed filename that cannot be named in a
+ * <link rel="preload">; a stable path lets us preload the exact file the
+ * @font-face rule then uses, so it is fetched once and arrives before paint.
+ */
+
 interface Props {
   title: string;
+  description: string;
+  /** Site-relative path of this page — drives canonical + og:url. */
+  path: string;
+  ogType?: 'website' | 'profile' | 'article';
+  noindex?: boolean;
+  /** Absolute/site-relative image to preload as the LCP element, if any. */
+  preloadImage?: string;
 }
 
-const { title } = Astro.props;
+const {
+  title,
+  description,
+  path,
+  ogType = 'website',
+  noindex = false,
+  preloadImage,
+} = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="description"
-      content="Full Stack JavaScript Developer with production experience building modern web applications, e-commerce platforms, shipping systems, and API-driven services with Vue.js, React.js, Next.js, Node.js, and Express.js."
+    <BaseHead
+      title={title}
+      description={description}
+      path={path}
+      ogType={ogType}
+      noindex={noindex}
     />
-    <meta name="viewport" content="width=device-width" />
-    <meta property="og:title" content="Nadir Khan" />
-    <meta property="og:url" content="https://www.samidev.me" />
-    <meta property="og:type" content="website" />
-    <meta
-      property="og:description"
-      content="Full Stack JavaScript Developer with production experience building modern web applications, e-commerce platforms, shipping systems, and API-driven services with Vue.js, React.js, Next.js, Node.js, and Express.js."
-    />
-    <meta property="og:image" content={new URL(`${import.meta.env.BASE_URL}og-image.webp`, Astro.site)} />
-    <meta property="og:site_name" content="Nadir Khan's Portfolio" />
-    <meta property="og:locale" content="en_US" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@noahkhan47" />
-    <meta name="twitter:creator" content="@noahkhan47" />
 
-    <link rel="icon" type="image/png" href={`${import.meta.env.BASE_URL}logo.png`} />
-    <!-- font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    {/* ===================== Resource hints =====================
+      Fonts are self-hosted, so no font-CDN preconnect is needed at all.
+      Only Google Analytics remains third-party: dns-prefetch resolves DNS
+      early, preconnect opens the TCP+TLS connection before Partytown asks
+      for the script. Both are cheap because there are only two origins —
+      over-using preconnect contends for bandwidth with the LCP image.
+    */}
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+
+    {/* Preload the exact font file used for first paint. `crossorigin` is
+      mandatory on font preloads or the browser fetches the file twice. */}
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/manrope-variable-latin.woff2"
+      crossorigin
     />
-    <meta name="generator" content="{Astro.generator}" />
-    <title>{title}</title>
-    <!-- Google tag (gtag.js) -->
+
+    {
+      /* Preload the LCP image. Without this the hero is only discovered after
+         CSS parses, which is the single largest LCP delay on this page. */
+      preloadImage && (
+        <link rel="preload" as="image" href={preloadImage} type="image/webp" fetchpriority="high" />
+      )
+    }
+
+    {/* Google Analytics, off the main thread via Partytown so it cannot
+      contribute to INP or block rendering. */}
     <script
       type="text/partytown"
       async
-      src="https://www.googletagmanager.com/gtag/js?id=G-ZQC1XS2QWG"></script>
-    <script type="text/partytown">
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag('js', new Date());
-
-      gtag('config', 'G-ZQC1XS2QWG');
-    </script>
+      src={`https://www.googletagmanager.com/gtag/js?id=${SITE.googleAnalyticsId}`}></script>
+    <script
+      type="text/partytown"
+      is:inline
+      set:html={`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${SITE.googleAnalyticsId}');`}
+    />
   </head>
   <body>
+    <!-- Keyboard users must be able to skip the decorative hero/preloader. -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <slot />
   </body>
 </html>
+
 <style is:global>
+  /* Self-hosted variable Manrope, one file for the whole 200–800 weight range.
+     font-display: swap renders text immediately in the fallback and swaps in
+     Manrope on arrival — never an invisible-text (FOIT) period, which is what
+     Lighthouse flags as "Ensure text remains visible during webfont load".
+     size-adjust/metric overrides keep the fallback's line box the same height
+     as Manrope's, so the swap does not reflow text and cause layout shift. */
+  @font-face {
+    font-family: 'Manrope Variable';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 200 800;
+    src: url('/fonts/manrope-variable-latin.woff2') format('woff2-variations');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+      U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+      U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+
+  @font-face {
+    font-family: 'Manrope Variable';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 200 800;
+    src: url('/fonts/manrope-variable-latin-ext.woff2') format('woff2-variations');
+    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF,
+      U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  }
+
+  /* Metric-matched fallback: sized so the system font occupies the same space
+     as Manrope while the webfont is still loading. Keeps CLS at 0 on swap. */
+  @font-face {
+    font-family: 'Manrope Fallback';
+    src: local('Arial');
+    size-adjust: 102%;
+    ascent-override: 98%;
+    descent-override: 26%;
+    line-gap-override: 0%;
+  }
+
   *,
   body,
   html {
-    font-family: 'Manrope', sans-serif;
+    font-family: 'Manrope Variable', 'Manrope Fallback', system-ui, sans-serif;
     box-sizing: border-box;
     scrollbar-width: none;
-    /* scroll-behavior: smooth; */
     scroll-margin: 15vh;
   }
 
@@ -82,10 +154,48 @@ const { title } = Astro.props;
     cursor: none;
   }
 
+  /* Visually hidden but read by screen readers AND indexed by search engines.
+     Used for content that is present for meaning but rendered graphically. */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 10000;
+    padding: 12px 20px;
+    background: #d5ff3f;
+    color: #0d0d0d;
+    font-weight: 700;
+    border-radius: 0 0 8px 0;
+  }
+  .skip-link:focus {
+    left: 0;
+  }
+
+  /* Visible focus ring for keyboard navigation (the site otherwise hides the
+     cursor, which makes focus state the only affordance keyboard users get). */
+  :focus-visible {
+    outline: 3px solid #d5ff3f;
+    outline-offset: 3px;
+  }
+
   .section-reveal {
     opacity: 0;
     transform: translateY(28px);
-    transition: opacity 700ms ease, transform 700ms ease;
+    transition:
+      opacity 700ms ease,
+      transform 700ms ease;
     will-change: opacity, transform;
   }
 
@@ -93,24 +203,49 @@ const { title } = Astro.props;
     opacity: 1;
     transform: translateY(0);
   }
+
+  /* Users who ask for reduced motion get content immediately and unanimated.
+     This also removes any chance of an animation delaying the LCP paint. */
+  @media (prefers-reduced-motion: reduce) {
+    .section-reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 </style>
 
 <script>
   import Lenis from '@studio-freight/lenis';
 
-  // ======== lenis scroll initialization =======
-  const lenis = new Lenis();
+  // Smooth scroll is a progressive enhancement: skip it entirely when the user
+  // has asked for reduced motion, and when the tab is not interactive.
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const raf = (time: number) => {
-    lenis.raf(time);
+  if (!prefersReducedMotion) {
+    const lenis = new Lenis();
+    const raf = (time: number) => {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    };
     requestAnimationFrame(raf);
-  };
-  requestAnimationFrame(raf);
+  }
 </script>
 
 <script>
   const revealTargets = document.querySelectorAll('.section-reveal');
-  if (revealTargets.length > 0) {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (revealTargets.length > 0 && !prefersReducedMotion) {
     const observer = new IntersectionObserver(
       (entries, obs) => {
         entries.forEach((entry) => {
@@ -124,5 +259,7 @@ const { title } = Astro.props;
     );
 
     revealTargets.forEach((el) => observer.observe(el));
+  } else {
+    revealTargets.forEach((el) => el.classList.add('is-visible'));
   }
 </script>

@@ -2,21 +2,23 @@
 import Flower from './Flower.astro';
 ---
 
-<div
+<section
+  id="why-work-with-me"
+  aria-labelledby="why-work-heading"
   class="brands-wrapper bg-black px-pageXMobile md:px-pageX text-white overflow-x-hidden relative z-40 min-h-screen flex items-center"
 >
   <div
     class="brands-grid gap-4 md:gap-8 py-[12vh] md:py-[14vh] items-stretch"
-    id="why-work-with-me"
   >
       <div
         class="bg-primary brands-section pin p-8 md:p-10 min-w-[33%] md:min-w-[50%] lg:min-w-[44%] xl:min-w-[36%] 2xl:min-w-[30%] rounded-3xl relative overflow-hidden"
       >
-        <div
+        <h2
+          id="why-work-heading"
           class="text-[2.2rem] md:text-[3rem] lg:text-[4rem] leading-[1.05] text-background font-[700] z-[1] absolute top-8 left-8 lg:top-1/2 lg:left-[78%] lg:-rotate-90 lg:-translate-x-3/4 lg:-translate-y-1/2 w-[80%] lg:w-full"
         >
           Why Work <br /> With Me?
-        </div>
+        </h2>
         <div
           class="absolute top-0 -left-[62%] md:-left-[50%] lg:-left-[42%] xl:-left-[35%] 2xl:-left-[36%] translate-x-1/2 opacity-40"
         >
@@ -30,11 +32,11 @@ import Flower from './Flower.astro';
           class="anim text-textDullest text-[1.8rem] md:text-[3rem] lg:text-[4rem]"
           >01</span
         >
-        <h2
+        <h3
           class="text-textLightPrimary font-bold text-left text-[1.8rem] md:text-[2rem] z-[1] lg:text-[2.4rem] mb-[20px] tracking-[3px] md:tracking-[5px] uppercase"
         >
           Diverse <br /> Experience
-        </h2>
+        </h3>
 
         <div class="col z-1 relative">
           <p
@@ -53,11 +55,11 @@ import Flower from './Flower.astro';
           class="anim text-textDullest text-[1.8rem] md:text-[3rem] lg:text-[4rem]"
           >02</span
         >
-        <h2
+        <h3
           class="text-textLightPrimary anim text-left font-bold text-[1.8rem] md:text-[2rem] z-[1] lg:text-[2.4rem] mb-[20px] tracking-[3px] md:tracking-[5px] uppercase"
         >
           Framework <br /> Independent
-        </h2>
+        </h3>
 
         <div class="col anim z-1 relative">
           <p
@@ -76,11 +78,11 @@ import Flower from './Flower.astro';
           class="anim text-textDullest text-[1.8rem] md:text-[3rem] lg:text-[4rem]"
           >03</span
         >
-        <h2
+        <h3
           class="text-textLightPrimary anim text-left font-bold text-[1.8rem] md:text-[2rem] z-[1] lg:text-[2.4rem] mb-[20px] tracking-[3px] md:tracking-[5px] uppercase"
         >
           Future <br /> Ready
-        </h2>
+        </h3>
 
         <div class="col anim z-1 relative">
           <p
@@ -99,11 +101,11 @@ import Flower from './Flower.astro';
           class="anim text-textDullest text-[1.8rem] md:text-[3rem] lg:text-[4rem]"
           >04</span
         >
-        <h2
+        <h3
           class="text-textLightPrimary anim text-left font-bold text-[1.8rem] md:text-[2rem] z-[1] lg:text-[2.4rem] mb-[20px] tracking-[3px] md:tracking-[5px] uppercase"
         >
           Result <br /> Driven
-        </h2>
+        </h3>
 
         <div class="col anim z-1 relative">
           <p
@@ -122,11 +124,11 @@ import Flower from './Flower.astro';
           class="anim text-textDullest text-[1.8rem] md:text-[3rem] lg:text-[4rem]"
           >05</span
         >
-        <h2
+        <h3
           class="text-textLightPrimary anim text-left font-bold text-[1.8rem] md:text-[2rem] z-[1] lg:text-[2.4rem] mb-[20px] tracking-[3px] md:tracking-[5px] uppercase"
         >
           Team <br /> Player
-        </h2>
+        </h3>
 
         <div class="col anim z-1 relative">
           <p
@@ -139,7 +141,7 @@ import Flower from './Flower.astro';
         </div>
       </div>
   </div>
-</div>
+</section>
 
 <style>
   .brands-grid {

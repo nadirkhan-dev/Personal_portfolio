@@ -1,0 +1,70 @@
+---
+import Layout from '../layouts/Layout.astro';
+import StructuredData from '../components/SEO/StructuredData.astro';
+import { PAGES, PERSON, SOCIALS } from '../config/site';
+
+// noindex: a 404 must never enter the index, and Google explicitly flags
+// indexable soft-404s as a Search Essentials violation.
+const { title, description, path } = PAGES.notFound;
+---
+
+<Layout title={title} description={description} path={path} noindex>
+  <StructuredData
+    path={path}
+    title={title}
+    description={description}
+    breadcrumbs={[{ name: 'Page Not Found', path: '/404' }]}
+    includePerson={false}
+  />
+
+  <main
+    id="main-content"
+    class="min-h-screen bg-background text-textLightPrimary px-pageXMobile md:px-pageX flex flex-col justify-center"
+  >
+    <p class="text-primary font-bold tracking-[6px] uppercase mb-6 text-sm md:text-base">
+      Error 404
+    </p>
+
+    <h1
+      class="text-[3rem] md:text-[5rem] lg:text-[6rem] font-[800] uppercase leading-[1.05] mb-8 text-textLight"
+    >
+      Page not <br /> found
+    </h1>
+
+    <p class="max-w-[52ch] text-textDullest text-[1rem] md:text-[1.15rem] leading-[1.6] mb-10">
+      This page doesn&apos;t exist on {PERSON.name}&apos;s portfolio. It may have been moved or
+      the link may be out of date. Everything is still one click away from the homepage.
+    </p>
+
+    <nav aria-label="Error page">
+      <ul class="flex flex-wrap gap-4 list-none p-0 m-0">
+        <li>
+          <a
+            href="/"
+            class="interactable interactable-link inline-flex items-center border-2 border-primary bg-primary text-background px-6 py-4 rounded-full font-bold uppercase text-[14px] md:text-[16px]"
+          >
+            Back to homepage
+          </a>
+        </li>
+        <li>
+          <a
+            href="/#projects"
+            class="interactable interactable-link inline-flex items-center border-2 border-darkBorder text-textLightPrimary px-6 py-4 rounded-full font-bold uppercase text-[14px] md:text-[16px]"
+          >
+            View projects
+          </a>
+        </li>
+        <li>
+          <a
+            href={SOCIALS.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="interactable interactable-link inline-flex items-center border-2 border-darkBorder text-textLightPrimary px-6 py-4 rounded-full font-bold uppercase text-[14px] md:text-[16px]"
+          >
+            LinkedIn
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </main>
+</Layout>

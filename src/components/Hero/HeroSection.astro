@@ -26,7 +26,26 @@ import MainTitle from './MainTitle.astro';
     position: absolute;
     inset: 0;
     z-index: -2;
-    background-image: url('/nadir-hero.png');
+    /*
+      LCP element. Was a single 1.3 MB PNG; now served as AVIF (12 KB) with a
+      WebP (20 KB) fallback and the original PNG as a last resort. image-set()
+      lets the browser pick the best format it supports, so no JS sniffing.
+      The WebP is additionally preloaded from <head> (see Layout.astro) because
+      a CSS background is not discoverable by the preload scanner and would
+      otherwise not start downloading until the stylesheet has parsed.
+    */
+    /* Ordered oldest-to-newest: each later declaration overrides the previous
+       one only in browsers that understand it. */
+    background-image: url('/nadir-hero.webp');
+    background-image: -webkit-image-set(
+      url('/nadir-hero.avif') type('image/avif'),
+      url('/nadir-hero.webp') type('image/webp')
+    );
+    background-image: image-set(
+      url('/nadir-hero.avif') type('image/avif'),
+      url('/nadir-hero.webp') type('image/webp')
+    );
+    background-color: #0d0d0d;
     background-repeat: no-repeat;
     background-size: auto 90%;
     background-position: center 8%;

@@ -1,0 +1,102 @@
+---
+/**
+ * Every <head> tag that matters for search and social lives here, and ONLY here.
+ *
+ * Centralising it is what prevents duplicate/conflicting metadata: a page cannot
+ * accidentally emit a second <title>, a second og:description or a stale og:url,
+ * because pages supply data, not tags.
+ */
+import { SITE, SITE_URL, TWITTER_HANDLE, PERSON, absoluteUrl } from '../../config/site';
+
+interface Props {
+  /** Full <title> text. Must be unique per page. */
+  title: string;
+  /** Meta description. Must be unique per page. */
+  description: string;
+  /** Site-relative path of THIS page, e.g. "/" or "/404". Drives the canonical URL. */
+  path: string;
+  /** Absolute or site-relative social image. Defaults to the site OG card. */
+  image?: string;
+  /** og:type — "website" for the homepage, "profile"/"article" elsewhere. */
+  ogType?: 'website' | 'profile' | 'article';
+  /** Set true for pages that must stay out of the index (404, thank-you pages…). */
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  path,
+  image = SITE.ogImage,
+  ogType = 'website',
+  noindex = false,
+} = Astro.props;
+
+const canonical = absoluteUrl(path);
+const ogImage = image.startsWith('http') ? image : absoluteUrl(image);
+
+// Explicit robots directives. max-image-preview:large is what allows Google to
+// show the OG card as a large thumbnail in Discover and image results.
+const robots = noindex
+  ? 'noindex, nofollow'
+  : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<!-- ============ Primary metadata ============ -->
+<title>{title}</title>
+<meta name="description" content={description} />
+<meta name="author" content={PERSON.name} />
+<meta name="robots" content={robots} />
+<meta name="googlebot" content={robots} />
+
+<!-- Canonical: one indexable address per page, so Google never has to guess. -->
+<link rel="canonical" href={canonical} />
+
+<!-- ============ Open Graph (Facebook, LinkedIn, WhatsApp, Slack) ============ -->
+<meta property="og:type" content={ogType} />
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:locale" content={SITE.locale} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:secure_url" content={ogImage} />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:width" content={String(SITE.ogImageWidth)} />
+<meta property="og:image:height" content={String(SITE.ogImageHeight)} />
+<meta property="og:image:alt" content={SITE.ogImageAlt} />
+{
+  ogType === 'profile' && (
+    <>
+      <meta property="profile:first_name" content={PERSON.givenName} />
+      <meta property="profile:last_name" content={PERSON.familyName} />
+    </>
+  )
+}
+
+<!-- ============ Twitter / X Card ============ -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content={TWITTER_HANDLE} />
+<meta name="twitter:creator" content={TWITTER_HANDLE} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+<meta name="twitter:image:alt" content={SITE.ogImageAlt} />
+
+<!-- ============ Icons & PWA ============ -->
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content={SITE.themeColor} />
+<meta name="apple-mobile-web-app-title" content={SITE.shortName} />
+<meta name="application-name" content={SITE.shortName} />
+<meta name="color-scheme" content="dark" />
+
+<!-- ============ Discovery ============ -->
+<link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+<link rel="me" href={SITE_URL} />
+<meta name="generator" content={Astro.generator} />

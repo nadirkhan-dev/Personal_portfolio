@@ -1,0 +1,182 @@
+---
+/**
+ * JSON-LD structured data, emitted as a single connected @graph.
+ *
+ * One graph beats several loose <script> blocks: every node carries a stable
+ * @id, so Google resolves Person <-> WebSite <-> WebPage <-> Projects as ONE
+ * entity instead of four unrelated ones. That linkage is the mechanism that
+ * makes a search for "Nadir Khan" resolve to this site.
+ */
+import { PERSON, SITE, SITE_URL, SAME_AS, RESUME_PATH, absoluteUrl } from '../../config/site';
+import type { Project } from '../../data/projects';
+
+interface Props {
+  /** Canonical path of the current page. */
+  path: string;
+  title: string;
+  description: string;
+  /** Breadcrumb trail. The home crumb is prepended automatically. */
+  breadcrumbs?: { name: string; path: string }[];
+  /** When supplied, each project is emitted as a SoftwareSourceCode node. */
+  projects?: Project[];
+  /** Emit the full Person/WebSite graph. Kept off on utility pages like 404. */
+  includePerson?: boolean;
+}
+
+const {
+  path,
+  title,
+  description,
+  breadcrumbs = [],
+  projects = [],
+  includePerson = true,
+} = Astro.props;
+
+const pageUrl = absoluteUrl(path);
+const websiteId = `${SITE_URL}/#website`;
+const pageId = `${pageUrl}#webpage`;
+const breadcrumbId = `${pageUrl}#breadcrumb`;
+
+// ---- Person -------------------------------------------------------------
+// The central entity. `sameAs` is the strongest signal Google has for tying
+// this site to the same human behind the linked social profiles.
+const person = {
+  '@type': 'Person',
+  '@id': PERSON.id,
+  name: PERSON.name,
+  alternateName: [...PERSON.alternateName],
+  givenName: PERSON.givenName,
+  familyName: PERSON.familyName,
+  jobTitle: PERSON.jobTitle,
+  description: PERSON.description,
+  url: SITE_URL,
+  image: {
+    '@type': 'ImageObject',
+    url: PERSON.image,
+    width: 864,
+    height: 1184,
+    caption: `${PERSON.name} — ${PERSON.jobTitle}`,
+  },
+  email: `mailto:${PERSON.email}`,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: PERSON.address.locality,
+    addressRegion: PERSON.address.region,
+    addressCountry: PERSON.address.country,
+  },
+  worksFor: {
+    '@type': 'Organization',
+    name: PERSON.worksFor.name,
+    url: PERSON.worksFor.url,
+  },
+  knowsAbout: [...PERSON.knowsAbout],
+  sameAs: SAME_AS,
+  mainEntityOfPage: { '@id': pageId },
+};
+
+// ---- WebSite ------------------------------------------------------------
+const website = {
+  '@type': 'WebSite',
+  '@id': websiteId,
+  url: SITE_URL,
+  name: SITE.name,
+  alternateName: PERSON.name,
+  description: PERSON.description,
+  inLanguage: 'en-US',
+  publisher: { '@id': PERSON.id },
+  author: { '@id': PERSON.id },
+  copyrightHolder: { '@id': PERSON.id },
+};
+
+// ---- BreadcrumbList -----------------------------------------------------
+// Always includes Home as position 1, then any page-supplied crumbs.
+const crumbs = [{ name: 'Home', path: '/' }, ...breadcrumbs];
+const breadcrumbList = {
+  '@type': 'BreadcrumbList',
+  '@id': breadcrumbId,
+  itemListElement: crumbs.map((crumb, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: crumb.name,
+    item: absoluteUrl(crumb.path),
+  })),
+};
+
+// ---- WebPage / ProfilePage ---------------------------------------------
+// The homepage IS the person's profile, so ProfilePage is the accurate type.
+const webPage = {
+  '@type': path === '/' ? 'ProfilePage' : 'WebPage',
+  '@id': pageId,
+  url: pageUrl,
+  name: title,
+  description,
+  isPartOf: { '@id': websiteId },
+  about: { '@id': PERSON.id },
+  ...(path === '/' ? { mainEntity: { '@id': PERSON.id } } : {}),
+  primaryImageOfPage: {
+    '@type': 'ImageObject',
+    url: SITE.ogImage,
+    width: SITE.ogImageWidth,
+    height: SITE.ogImageHeight,
+  },
+  breadcrumb: { '@id': breadcrumbId },
+  inLanguage: 'en-US',
+};
+
+// ---- SoftwareSourceCode (one per project) ------------------------------
+const projectNodes = projects.map((project) => {
+  const primaryUrl = project.links?.[0]?.url ?? project.url;
+  return {
+    '@type': 'SoftwareSourceCode',
+    '@id': `${SITE_URL}/#project-${project._id}`,
+    name: project.name,
+    description: project.description,
+    ...(primaryUrl ? { url: primaryUrl, codeRepository: primaryUrl } : {}),
+    applicationCategory: project.category,
+    programmingLanguage: (project.programmingLanguage ?? ['JavaScript']).map((lang) => ({
+      '@type': 'ComputerLanguage',
+      name: lang,
+    })),
+    runtimePlatform: 'Web',
+    image: project.posterImage.startsWith('http')
+      ? project.posterImage
+      : absoluteUrl(project.posterImage),
+    author: { '@id': PERSON.id },
+    creator: { '@id': PERSON.id },
+    isPartOf: { '@id': websiteId },
+  };
+});
+
+// Groups the projects so the page exposes a single, ordered portfolio list.
+const projectList =
+  projectNodes.length > 0
+    ? [
+        {
+          '@type': 'ItemList',
+          '@id': `${pageUrl}#projects`,
+          name: `Projects by ${PERSON.name}`,
+          description: `Software projects designed and built by ${PERSON.name}, ${PERSON.jobTitle}.`,
+          numberOfItems: projectNodes.length,
+          itemListOrder: 'https://schema.org/ItemListOrderAscending',
+          itemListElement: projectNodes.map((node, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            item: { '@id': node['@id'] },
+          })),
+        },
+        ...projectNodes,
+      ]
+    : [];
+
+const graph = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    ...(includePerson ? [person, website] : []),
+    webPage,
+    breadcrumbList,
+    ...projectList,
+  ],
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(graph)} is:inline />
